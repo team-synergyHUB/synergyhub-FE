@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { ROUTES } from "../../routes";
 import "./TeamCard.css";
 import TeamEditModal from "./TeamEditModal";
 import MemberListModal from "./MemberListModal";
@@ -24,7 +25,7 @@ const TeamCard = ({ id, name, members = [], comments = 0 }) => {
                 return;
             }
 
-            const response = await fetch(`http://localhost:8080/teams/${id}/invite-code`, {
+            const response = await fetch(`${process.env.REACT_APP_API_URL}/teams/${id}/invite-code`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -43,42 +44,15 @@ const TeamCard = ({ id, name, members = [], comments = 0 }) => {
         }
     };
 
-    // // 멤버 수 가져오는 함수
-    // const fetchMemberCount = async () => {
-    //     try {
-    //         const token = localStorage.getItem("accessToken");
-    //         if (!token) {
-    //             alert("인증 정보가 없습니다. 다시 로그인해주세요.");
-    //             return;
-    //         }
-    //
-    //         const response = await fetch(`http://localhost:8080/member-teams/${id}/members`, {
-    //             headers: {
-    //                 Authorization: `Bearer ${token}`,
-    //             },
-    //         });
-    //
-    //         if (!response.ok) {
-    //             throw new Error("Failed to fetch member count");
-    //         }
-    //
-    //         const data = await response.json();
-    //         setMemberCount(data.length);
-    //     } catch (error) {
-    //         console.error("Error fetching member count:", error);
-    //     }
-    // };
-    // 멤버 수 가져오는 함수
-
     const fetchMemberCount = async () => {
         try {
             const token = localStorage.getItem("accessToken");
             if (!token) {
-                alert("인증 정보가 없습니다. 다시 로그인해주세요.");
+                // alert("인증 정보가 없습니다. 다시 로그인해주세요.");
                 return;
             }
 
-            const response = await fetch(`http://localhost:8080/member-teams/${id}/members`, {
+            const response = await fetch(`${process.env.REACT_APP_API_URL}/member-teams/${id}/members`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -97,11 +71,11 @@ const TeamCard = ({ id, name, members = [], comments = 0 }) => {
 
     useEffect(() => {
         fetchMemberCount(); // 컴포넌트가 렌더링될 때 멤버 수 가져오기
-    }, [id]); // id가 변경될 때도 다시 호출
+    }, [id,fetchMemberCount]); // id가 변경될 때도 다시 호출
 
     // 라벨 데이터 가져오기
     useEffect(() => {
-        fetch(`http://localhost:8080/api/labels/team/${id}`)
+        fetch(`${process.env.REACT_APP_API_URL}/api/labels/team/${id}`)
             .then((response) => {
                 if (!response.ok) {
                     throw new Error("Failed to fetch label data");
@@ -124,7 +98,7 @@ const TeamCard = ({ id, name, members = [], comments = 0 }) => {
                 alert("인증 정보가 없습니다. 다시 로그인해주세요.");
                 return;
             }
-            const response = await fetch(`http://localhost:8080/member-teams/${id}/members`, {
+            const response = await fetch(`${process.env.REACT_APP_API_URL}/member-teams/${id}/members`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -158,7 +132,7 @@ const TeamCard = ({ id, name, members = [], comments = 0 }) => {
                 return;
             }
 
-            const response = await fetch(`http://localhost:8080/member-teams/${id}/leave`, {
+            const response = await fetch(`${process.env.REACT_APP_API_URL}/member-teams/${id}/leave`, {
                 method: "DELETE",
                 headers: {
                     "Content-Type": "application/json",
@@ -179,8 +153,9 @@ const TeamCard = ({ id, name, members = [], comments = 0 }) => {
     };
 
     const handleCardClick = () => {
-        navigate(`/team/${id}`);
+        navigate(`${ROUTES.TEAM_VIEW}?team=${id}`);
     };
+
 
     const handleEditTeam = (e) => {
         e.stopPropagation();
@@ -260,9 +235,6 @@ const TeamCard = ({ id, name, members = [], comments = 0 }) => {
                         >
                             ✉️
                         </button>
-                    </div>
-                    <div className="team-comments">
-                        <span className="comments-icon">💬</span> {comments}
                     </div>
                 </div>
             </div>
